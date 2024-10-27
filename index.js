@@ -14,7 +14,8 @@ const config = {
 const redis = new Redis(process.env.REDIS_URL);
 
 app.post('/webhook', line.middleware(config), async (req, res) => {
-      //const userId = event.source.userId;
+ try {  
+    //const userId = event.source.userId;
   const client = new line.Client(config);
 
   const events = req.body.events;
@@ -43,6 +44,12 @@ app.post('/webhook', line.middleware(config), async (req, res) => {
   }
 
   res.status(200).end();
+} catch (error) {
+    console.error('Error occurred:', error); // エラー全体をログに出力
+    console.error('Error message:', error.message); // エラーメッセージをログに出力
+    console.error('Error stack:', error.stack); // スタックトレースをログに出力
+    res.status(500).end();
+  }
 });
 
 app.listen(process.env.PORT || 3000);
