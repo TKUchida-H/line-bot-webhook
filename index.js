@@ -13,13 +13,6 @@ const config = {
 // Redis設定
 const redis = new Redis(process.env.REDIS_URL);
 
-redis.on('connect', () => {
-  console.log('Redisに接続しました');
-});
-
-redis.on('error', (error) => {
-  console.error('Redis接続エラー:', error);
-});
 
 app.post('/webhook', line.middleware(config), async (req, res) => {
   const client = new line.Client(config);
@@ -34,11 +27,11 @@ app.post('/webhook', line.middleware(config), async (req, res) => {
         // 対応状況を取得
         const status = await redis.get(userId);
 
-        if (status === '対応済み') {
-          // 対応済みの場合は何もしない
+        if (status === '対応中') {
+          // 対応中の場合は何もしない
           continue;
         } else {
-          // 未対応または対応中の場合、メッセージを返信
+          // 未対応の場合、メッセージを返信
           await client.replyMessage(event.replyToken, {
             type: 'text',
             text: 'お問い合わせありがとうございます。担当者が対応いたします。',
