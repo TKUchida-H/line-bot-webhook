@@ -21,34 +21,9 @@ const config = {
 // ここで `client` を定義
 const client = new line.Client(config);
 
-
-// JSONボディのパース
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
 // Redis設定
 const redis = new Redis(process.env.REDIS_URL);
 
-
-// ユーザー一覧を取得
-app.get('/api/users', async (req, res) => {
-  try {
-    const keys = await redis.keys('*');
-    const users = [];
-
-    for (const userId of keys) {
-      const status = await redis.get(userId);
-      const displayName = await redis.hget(`user:${userId}`, 'displayName') || '不明';
-
-      users.push({ userId, displayName, status });
-    }
-
-    res.json(users);
-  } catch (error) {
-    console.error('ユーザー一覧取得エラー:', error);
-    res.status(500).json({ error: 'ユーザー一覧の取得に失敗しました' });
-  }
-});
 
 // ユーザーの対応状態を更新
 app.post('/api/users/:userId/status', async (req, res) => {
@@ -80,10 +55,6 @@ app.post('/api/users/:userId/status', async (req, res) => {
 
         if (status === '対応中') {
           // 対応中の場合は何もしない
-          await client.replyMessage(event.replyToken, {
-            type: 'text',
-            text: `お問い合わせありがとうございます、${displayName}さん。担当者が対応します。`,
-          });
           continue;
         } else {
           await client.replyMessage(event.replyToken, {
@@ -101,6 +72,32 @@ app.post('/api/users/:userId/status', async (req, res) => {
   } catch (error) {
     console.error('エラーが発生しました:', error);
     res.status(500).end();
+  }
+});
+
+
+// JSONボディのパース
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+
+// ユーザー一覧を取得
+app.get('/api/users', async (req, res) => {
+  try {
+    const keys = await redis.keys('*');
+    const users = [];
+
+    for (const userId of keys) {
+      const status = await redis.get(userId);
+      const displayName = await redis.hget(`user:${userId}`, 'displayName') || '不明';
+
+      users.push({ userId, displayName, status });
+    }
+
+    res.json(users);
+  } catch (error) {
+    console.error('ユーザー一覧取得エラー:', error);
+    res.status(500).json({ error: 'ユーザー一覧の取得に失敗しました' });
   }
 });
 
