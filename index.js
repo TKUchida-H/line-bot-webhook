@@ -20,12 +20,12 @@ app.post('/webhook', line.middleware(config), async (req, res) => {
 
   for (const event of events) {
     if (event.type === 'message' && event.message.type === 'text') {
-      const userId = event.source.userId;
+      //const userId = event.source.userId;
 
       // 対応状況をチェック
-      const isResponded = await redis.get(userId);
+      //const isResponded = await redis.get(userId);
 
-      if (!isResponded) {
+      //if (!isResponded) {
         // 特定のメッセージを返信
         await client.replyMessage(event.replyToken, {
           type: 'text',
@@ -33,7 +33,7 @@ app.post('/webhook', line.middleware(config), async (req, res) => {
         });
 
         // 対応済みとして記録（有効期限を設定することも可能）
-        await redis.set(userId, true);
+        //await redis.set(userId, true);
       }
       // 対応済みの場合は何もしない
     }
