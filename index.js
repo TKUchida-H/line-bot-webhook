@@ -7,9 +7,10 @@ const app = express();
 
 // CORS設定
 app.use(cors({
-  origin: 'https://tkuchida-h.github.io//line-bot-webhook',
+  origin: 'https://tkuchida-h.github.io',
   optionsSuccessStatus: 200
 }));
+
 
 // LINE設定
 const config = {
@@ -20,12 +21,14 @@ const config = {
 // ここで `client` を定義
 const client = new line.Client(config);
 
+
 // JSONボディのパース
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Redis設定
 const redis = new Redis(process.env.REDIS_URL);
+
 
 // ユーザー一覧を取得
 app.get('/api/users', async (req, res) => {
