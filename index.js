@@ -82,7 +82,7 @@ app.post('/webhook', line.middleware(config), async (req, res) => {
           // 対応中の場合は何もしない
           continue;
         } else {
-          // 未対応の場合、メッセージを返信
+          // 対応済の場合、メッセージを返信
           await client.replyMessage(event.replyToken, {
             type: 'text',
             text: 'お問い合わせありがとうございます。担当者が対応いたします。',

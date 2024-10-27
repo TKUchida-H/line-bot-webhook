@@ -24,15 +24,15 @@ async function fetchUsers() {
 
       // 対応状態
       const statusCell = document.createElement('td');
-      statusCell.textContent = user.status || '未対応';
+      statusCell.textContent = user.status || '対応済';
       row.appendChild(statusCell);
 
       // 操作
       const actionCell = document.createElement('td');
       const toggleButton = document.createElement('button');
-      toggleButton.textContent = user.status === '対応中' ? '未対応にする' : '対応中にする';
+      toggleButton.textContent = user.status === '対応中' ? '対応済にする' : '対応中にする';
       toggleButton.addEventListener('click', () => {
-        const newStatus = user.status === '対応中' ? '未対応' : '対応中';
+        const newStatus = user.status === '対応中' ? '対応済' : '対応中';
         updateUserStatus(user.userId, newStatus);
       });
       actionCell.appendChild(toggleButton);
