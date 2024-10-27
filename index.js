@@ -7,7 +7,7 @@ const app = express();
 
 // CORS設定
 app.use(cors({
-  origin: 'https://TKUchida-H.github.io//line-bot-webhook',
+  origin: 'https://tkuchida-h.github.io//line-bot-webhook',
   optionsSuccessStatus: 200
 }));
 
