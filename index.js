@@ -58,20 +58,22 @@ app.get('/admin', async (req, res) => {
   const keys = await redis.keys('*');
   const users = [];
 
-  for (const key of keys) {
-    const status = await redis.get(key);
-    users.push({ userId: key, status });
+  for (const userId of keys) {
+    const status = await redis.get(userId);
+
+    // ユーザープロフィールの取得
+    let displayName = '';
+    try {
+      const profile = await client.getProfile(userId);
+      displayName = profile.displayName;
+    } catch (error) {
+      console.error(`ユーザーID ${userId} のプロフィール取得に失敗しました:`, error);
+      displayName = '取得失敗';
+    }
+
+    users.push({ userId, displayName, status });
   }
 
   // ユーザー一覧を表示（テンプレートエンジンやフロントエンドフレームワークを使用）
   res.json(users);
-});
-
-app.post('/admin/update', async (req, res) => {
-  const { userId, status } = req.body;
-
-  // 対応状況を更新
-  await redis.set(userId, status);
-
-  res.status(200).send('更新しました');
 });
