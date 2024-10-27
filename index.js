@@ -13,41 +13,39 @@ const config = {
 // Redis設定
 const redis = new Redis(process.env.REDIS_URL);
 
+
 app.post('/webhook', line.middleware(config), async (req, res) => {
- try {  
-    //const userId = event.source.userId;
   const client = new line.Client(config);
 
-  const events = req.body.events;
+  try {
+    const events = req.body.events;
 
-  for (const event of events) {
-    if (event.type === 'message' && event.message.type === 'text') {
+    for (const event of events) {
+      if (event.type === 'message' && event.message.type === 'text') {
+        const userId = event.source.userId;
 
-    console.log('Event:', event); // 追加
-      //const userId = event.source.userId;
+        // 対応状況を取得
+        const status = await redis.get(userId);
 
-      // 対応状況をチェック
-      //const isResponded = await redis.get(userId);
+        if (status === '対応済み') {
+          // 対応済みの場合は何もしない
+          continue;
+        } else {
+          // 未対応または対応中の場合、メッセージを返信
+          await client.replyMessage(event.replyToken, {
+            type: 'text',
+            text: 'お問い合わせありがとうございます。担当者が対応いたします。',
+          });
 
-      //if (!isResponded) {
-        // 特定のメッセージを返信
-        await client.replyMessage(event.replyToken, {
-          type: 'text',
-          text: 'お問い合わせありがとうございます。担当者よりご連絡いたします。',
-        });
-
-        // 対応済みとして記録（有効期限を設定することも可能）
-        //await redis.set(userId, true);
-      //}
-      // 対応済みの場合は何もしない
+          // 対応状況を「対応中」に設定
+          await redis.set(userId, '対応中');
+        }
+      }
     }
-  }
 
-  res.status(200).end();
-} catch (error) {
-    console.error('Error occurred:', error); // エラー全体をログに出力
-    console.error('Error message:', error.message); // エラーメッセージをログに出力
-    console.error('Error stack:', error.stack); // スタックトレースをログに出力
+    res.status(200).end();
+  } catch (error) {
+    console.error('エラーが発生しました:', error);
     res.status(500).end();
   }
 });
