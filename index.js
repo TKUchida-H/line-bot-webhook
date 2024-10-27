@@ -50,7 +50,6 @@ app.post('/webhook', line.middleware(config), async (req, res) => {
   }
 });
 
-app.listen(process.env.PORT || 3000);
 
 
 app.get('/admin', async (req, res) => {
@@ -77,3 +76,5 @@ app.get('/admin', async (req, res) => {
   // ユーザー一覧を表示（テンプレートエンジンやフロントエンドフレームワークを使用）
   res.json(users);
 });
+
+app.listen(process.env.PORT || 3000);
