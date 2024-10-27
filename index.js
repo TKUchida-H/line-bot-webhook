@@ -34,7 +34,7 @@ app.post('/webhook', line.middleware(config), async (req, res) => {
 
         // 対応済みとして記録（有効期限を設定することも可能）
         //await redis.set(userId, true);
-      }
+      //}
       // 対応済みの場合は何もしない
     }
   }
