@@ -13,6 +13,13 @@ const config = {
 // Redis設定
 const redis = new Redis(process.env.REDIS_URL);
 
+redis.on('connect', () => {
+  console.log('Redisに接続しました');
+});
+
+redis.on('error', (error) => {
+  console.error('Redis接続エラー:', error);
+});
 
 app.post('/webhook', line.middleware(config), async (req, res) => {
   const client = new line.Client(config);
@@ -51,3 +58,4 @@ app.post('/webhook', line.middleware(config), async (req, res) => {
 });
 
 app.listen(process.env.PORT || 3000);
+
