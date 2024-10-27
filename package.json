@@ -2,15 +2,16 @@
   "name": "line-bot-webhook",
   "version": "1.0.0",
   "main": "index.js",
-"scripts": {
-  "start": "node index.js"
-},
+  "scripts": {
+    "start": "node index.js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
     "@line/bot-sdk": "^9.4.2",
+    "cors": "^2.8.5",
     "express": "^4.21.1",
     "ioredis": "^5.4.1"
   }
