@@ -14,12 +14,15 @@ const config = {
 const redis = new Redis(process.env.REDIS_URL);
 
 app.post('/webhook', line.middleware(config), async (req, res) => {
+      //const userId = event.source.userId;
   const client = new line.Client(config);
 
   const events = req.body.events;
 
   for (const event of events) {
     if (event.type === 'message' && event.message.type === 'text') {
+
+    console.log('Event:', event); // 追加
       //const userId = event.source.userId;
 
       // 対応状況をチェック
