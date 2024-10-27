@@ -114,4 +114,7 @@ app.post('/api/users/:userId/status', async (req, res) => {
     console.error(`ユーザーID ${userId} の対応状態更新エラー:`, error);
     res.status(500).json({ error: '対応状態の更新に失敗しました' });
   }
+});
+
+
 app.listen(process.env.PORT || 3000);
