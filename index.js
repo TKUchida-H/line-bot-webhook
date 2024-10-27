@@ -56,36 +56,39 @@ app.post('/api/users/:userId/status', async (req, res) => {
   const { status } = req.body;
 
   try {
-    await redis.set(userId, status);
-    res.json({ message: '対応状態を更新しました' });
-  } catch (error) {
-    console.error(`ユーザーID ${userId} の対応状態更新エラー:`, error);
-    res.status(500).json({ error: '対応状態の更新に失敗しました' });
-  }
-});
-
-
-app.post('/webhook', line.middleware(config), async (req, res) => {
-  client = new line.Client(config);
-
-  try {
     const events = req.body.events;
 
     for (const event of events) {
       if (event.type === 'message' && event.message.type === 'text') {
         const userId = event.source.userId;
 
+        // プロフィール情報の取得
+        let displayName = '';
+        try {
+          const profile = await client.getProfile(userId);
+          displayName = profile.displayName;
+
+          // プロフィール情報をRedisに保存
+          await redis.hset(`user:${userId}`, 'displayName', displayName);
+        } catch (error) {
+          console.error(`ユーザーID ${userId} のプロフィール取得に失敗しました:`, error);
+          displayName = '取得失敗';
+        }
+
         // 対応状況を取得
         const status = await redis.get(userId);
 
         if (status === '対応中') {
           // 対応中の場合は何もしない
-          continue;
-        } else {
-          // 対応済の場合、メッセージを返信
           await client.replyMessage(event.replyToken, {
             type: 'text',
-            text: 'お問い合わせありがとうございます。担当者が対応いたします。',
+            text: `お問い合わせありがとうございます、${displayName}さん。担当者が対応します。`,
+          });
+          continue;
+        } else {
+          await client.replyMessage(event.replyToken, {
+            type: 'text',
+            text: `お問い合わせありがとうございます、${displayName}さん。担当者が対応いたします。`,
           });
 
           // 対応状況を「対応中」に設定
