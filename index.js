@@ -11,8 +11,18 @@ app.use(cors({
   optionsSuccessStatus: 200
 }));
 
+// LINE設定
+const config = {
+  channelAccessToken: process.env.LINE_ACCESS_TOKEN,
+  channelSecret: process.env.LINE_CHANNEL_SECRET,
+};
+
+// ここで `client` を定義
+const client = new line.Client(config);
+
 // JSONボディのパース
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Redis設定
 const redis = new Redis(process.env.REDIS_URL);
@@ -53,7 +63,7 @@ app.post('/api/users/:userId/status', async (req, res) => {
 
 
 app.post('/webhook', line.middleware(config), async (req, res) => {
-  const client = new line.Client(config);
+  client = new line.Client(config);
 
   try {
     const events = req.body.events;
