@@ -52,3 +52,26 @@ app.post('/webhook', line.middleware(config), async (req, res) => {
 
 app.listen(process.env.PORT || 3000);
 
+
+app.get('/admin', async (req, res) => {
+  // 全ユーザーの対応状況を取得
+  const keys = await redis.keys('*');
+  const users = [];
+
+  for (const key of keys) {
+    const status = await redis.get(key);
+    users.push({ userId: key, status });
+  }
+
+  // ユーザー一覧を表示（テンプレートエンジンやフロントエンドフレームワークを使用）
+  res.json(users);
+});
+
+app.post('/admin/update', async (req, res) => {
+  const { userId, status } = req.body;
+
+  // 対応状況を更新
+  await redis.set(userId, status);
+
+  res.status(200).send('更新しました');
+});
