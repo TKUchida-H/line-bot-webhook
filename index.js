@@ -106,32 +106,12 @@ app.post('/api/users/:userId/status', async (req, res) => {
   const { status } = req.body;
 
   try {
-    const events = req.body.events;
+    // 対応状態をRedisに保存
+    await redis.set(userId, status);
 
-    for (const event of events) {
-      if (event.type === 'message' && event.message.type === 'text') {
-        const userId = event.source.userId;
-
-        // プロフィール情報の取得
-        let displayName = '';
-        try {
-          const profile = await client.getProfile(userId);
-          displayName = profile.displayName;
-
-          // プロフィール情報をRedisに保存
-          await redis.hset(`user:${userId}`, 'displayName', displayName);
-        } catch (error) {
-          console.error(`ユーザーID ${userId} のプロフィール取得に失敗しました:`, error);
-          displayName = '取得失敗';
-        }
-      }
-    }
-
-    res.status(200).end();
+    res.json({ message: '対応状態を更新しました' });
   } catch (error) {
-    console.error('エラーが発生しました:', error);
-    res.status(500).end();
+    console.error(`ユーザーID ${userId} の対応状態更新エラー:`, error);
+    res.status(500).json({ error: '対応状態の更新に失敗しました' });
   }
-});
-
 app.listen(process.env.PORT || 3000);
